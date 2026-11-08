@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#09090b">
+  <title>LIRIX — Premium Accounts</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    /* === ПЕРЕМЕННЫЕ (Тема по умолчанию: Графит/Стекло) === */
+    :root {
+      color-scheme: dark;
+      --bg: #09090b;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #1c1c24 0%, #09090b 70%);
+      --surface: rgba(255, 255, 255, 0.04);
+      --surface-hover: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --text-muted: #a1a1aa;
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.3);
+      --btn-text: #ffffff;
+      --modal-bg: #121216;
+      
+      /* Фоновая картинка главного экрана (Mercedes) */
+      --hero-image: url('https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1000&auto=format&fit=crop'); 
+    }
+
+    /* === ТЕМА: ДОСТАВКА (Красно-Черный) === */
+    body.theme-delivery {
+      --bg: #050000;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #2a0000 0%, #050000 70%);
+      --surface: rgba(255, 0, 0, 0.05);
+      --surface-hover: rgba(255, 0, 0, 0.1);
+      --border: rgba(255, 0, 0, 0.15);
+      --text: #ffffff;
+      --text-muted: #fca5a5; /* Светло-красный */
+      --accent: #ef4444; /* Ярко-красный */
+      --accent-glow: rgba(239, 68, 68, 0.4);
+      --btn-text: #ffffff;
+      --modal-bg: #120000;
+      --hero-image: url('https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=1000&auto=format&fit=crop'); 
+    }
+
+    /* === ТЕМА: ТАКСИ (Черно-Желтый) === */
+    body.theme-taxi {
+      --bg: #0a0900;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #2a2200 0%, #0a0900 70%);
+      --surface: rgba(250, 204, 21, 0.05);
+      --surface-hover: rgba(250, 204, 21, 0.1);
+      --border: rgba(250, 204, 21, 0.15);
+      --text: #ffffff;
+      --text-muted: #d4d4d8;
+      --accent: #facc15;
+      --accent-glow: rgba(250, 204, 21, 0.3);
+      --btn-text: #000000;
+      --modal-bg: #121000;
+      --hero-image: url('https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop'); 
+    }
+
+    /* === ТЕМА: КАРШЕРИНГ (Гроза: Черно-Бело-Синий) === */
+    body.theme-carsharing {
+      --bg: #040810;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #0a1e3f 0%, #040810 70%);
+      --surface: rgba(14, 165, 233, 0.05);
+      --surface-hover: rgba(14, 165, 233, 0.1);
+      --border: rgba(56, 189, 248, 0.15);
+      --text: #ffffff;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8; /* Электрик */
+      --accent-glow: rgba(56, 189, 248, 0.4);
+      --btn-text: #040810; /* Темный текст на голубых кнопках */
+      --modal-bg: #040810;
+      /* Обновил картинку на 100% рабочую и подходящую по стилю */
+      --hero-image: url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000&auto=format&fit=crop'); 
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      background: var(--bg);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text);
+      font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      transition: background 0.4s ease, color 0.4s ease;
+      overflow-x: hidden;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .app { max-width: 600px; margin: 0 auto; padding: 0 16px 40px; }
+
+    /* Шапка */
+    header { padding: calc(20px + env(safe-area-inset-top)) 4px 20px; display: flex; align-items: center; justify-content: flex-start; }
+    .logo { 
+      font-size: 24px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; 
+      color: var(--text); 
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo::before {
+      content: ''; display: block; width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 15px var(--accent-glow);
+    }
+    
+    /* ГЛАВНЫЙ БАННЕР */
+    .hero {
+      position: relative; padding: 32px 24px 24px; border-radius: 32px; 
+      background-color: #000; background-image: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, var(--bg) 100%), var(--hero-image);
+      background-size: cover; background-position: center; 
+      border: 1px solid var(--border); overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .hero-top-tag {
+      display: inline-block; font-size: 10px; letter-spacing: 1.5px; font-weight: 700;
+      text-transform: uppercase; color: var(--text); background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px); padding: 6px 12px; border-radius: 99px; margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    h1 { font-size: 38px; line-height: 1.05; margin: 0 0 16px; font-weight: 800; letter-spacing: -1.5px; }
+    h1 span { color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); }
+    .hero p { margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.4; max-width: 90%; }
+    
+    /* Кнопки в шапке */
+    .hero-buttons { display: flex; gap: 10px; margin-top: 28px; }
+    .btn-tg, .btn-buy { 
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; padding: 16px 20px; border-radius: 16px;
+      font-weight: 800; font-size: 15px; flex: 1; color: var(--btn-text);
+      transition: all 0.2s ease; 
+    }
+    .btn-tg { background: var(--accent); box-shadow: 0 8px 25px var(--accent-glow); border: none; }
+    .btn-buy { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: var(--text); backdrop-filter: blur(10px); }
+    .btn-tg:active, .btn-buy:active { transform: scale(0.96); }
+
+    /* Фильтры (Горизонтальный скролл) */
+    .filters-wrapper {
+      margin: 24px -16px; padding: 0 16px; 
+      overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+      display: flex; gap: 10px;
+    }
+    .filters-wrapper::-webkit-scrollbar { display: none; }
+    
+    .filter-btn {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 12px 20px; border-radius: 99px; color: var(--text);
+      font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    .filter-btn.active {
+      background: var(--text); border-color: var(--text); color: var(--bg);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Поиск */
+    .toolbar { margin: 0 0 24px; }
+    .search-wrapper { position: relative; }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+    .search { 
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; color: var(--text); padding: 16px 16px 16px 44px;
+      font-size: 15px; outline: none; transition: 0.3s; backdrop-filter: blur(10px);
+    }
+    .search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    
+    /* Заголовки разделов */
+    .section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    h2 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
+    .count { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+
+    /* Сетка карточек */
+    .catalog-layout { display: flex; flex-direction: column; gap: 24px; }
+    .category-col { display: flex; flex-direction: column; gap: 10px; }
+    .col-header { display: none; }
+    
+    .cards-wrapper { display: flex; flex-direction: column; gap: 12px; }
+
+    /* Карточка (Glassmorphism) */
+    .card {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex; align-items: center; gap: 16px;
+      cursor: pointer; transition: all 0.2s ease;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .card:active { transform: scale(0.97); background: var(--surface-hover); }
+    
+    .ico { 
+      width: 52px; height: 52px; border-radius: 16px; 
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
+      display: grid; place-items: center; font-size: 24px; flex-shrink: 0; 
+    }
+    
+    .card-content { flex: 1; min-width: 0; }
+    .card h3 { font-size: 16px; margin: 0 0 4px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.3px; }
+    .card p { font-size: 13px; color: var(--text-muted); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .details-btn { 
+      width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); 
+      display: grid; place-items: center; color: var(--text); flex-shrink: 0; 
+      font-weight: bold; font-size: 16px; transition: 0.2s;
+    }
+    .card:active .details-btn { background: var(--accent); color: var(--btn-text); }
+
+    /* Модальное окно (Bottom Sheet) */
+    dialog {
+      width: 100%; max-width: 100%; margin: 0; position: fixed; bottom: 0; top: auto;
+      border: none; border-top: 1px solid var(--border); border-radius: 32px 32px 0 0;
+      background: var(--modal-bg); color: var(--text);
+      padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+      box-shadow: 0 -20px 50px rgba(0,0,0,0.5);
+      max-height: 92vh; 
+      display: none;
+    }
+    
+    dialog[open] {
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+
+    .modal-drag-handle {
+      width: 48px; height: 4px; background: var(--border); border-radius: 99px;
+      margin: -12px auto 20px; display: block;
+    }
+
+    dialog h2 { font-size: 24px; margin: 0 0 16px; font-weight: 800; letter-spacing: -0.5px; }
+    dialog .modal-content { font-size: 14px; line-height: 1.6; color: var(--text-muted); overflow-y: auto; padding-bottom: 16px; -webkit-overflow-scrolling: touch; }
+    
+    /* Баннер в модалке */
+    .modal-banner-wrapper { margin: -24px -20px 20px -20px; border-radius: 32px 32px 0 0; overflow: hidden; position: relative; }
+    .modal-banner-wrapper img { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .modal-banner-wrapper::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: linear-gradient(to top, var(--modal-bg), transparent); }
+
+    .m-section { margin-bottom: 16px; background: var(--surface); padding: 16px; border-radius: 20px; border: 1px solid var(--border); }
+    .m-section h4 { margin: 0 0 8px; color: var(--text); font-size: 16px; font-weight: 700; }
+    .m-section p { margin: 0 0 8px; font-size: 13px; color: var(--text-muted); }
+    .m-section p:last-child { margin-bottom: 0; }
+    .m-section ul { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: var(--text-muted); }
+    .m-section li { margin-bottom: 6px; }
+    
+    .price-tag { font-size: 22px; font-weight: 900; color: var(--btn-text); background: var(--accent); display: inline-block; padding: 8px 20px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 15px var(--accent-glow); }
+    .alert-text { color: #ef4444; font-weight: 600; background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2); margin-top: 12px; display: block; font-size: 13px; }
+    .highlight-text { color: var(--accent); font-weight: 700; }
+    
+    .step-list { counter-reset: step; padding: 0; margin: 0; }
+    .step-list li { position: relative; padding-left: 28px; margin-bottom: 12px; list-style: none; font-size: 13px; color: var(--text-muted); }
+    .step-list li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0; background: var(--text); color: var(--bg); width: 20px; height: 20px; border-radius: 50%; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+
+    /* Кнопки в модалке */
+    .modal-actions { display: flex; gap: 10px; margin-top: auto; padding-top: 16px; }
+    .btn-buy-modal, .close-btn { 
+      display: flex; align-items: center; justify-content: center;
+      padding: 18px; border-radius: 16px; font-weight: 800; font-size: 16px; border: none; cursor: pointer; flex: 1;
+    }
+    .btn-buy-modal { background: var(--accent); color: var(--btn-text); text-decoration: none; box-shadow: 0 8px 25px var(--accent-glow); }
+    .close-btn { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+
+    /* Инфо-блоки */
+    .info-block { border: 1px solid var(--border); background: var(--surface); border-radius: 24px; padding: 24px; margin-top: 32px; backdrop-filter: blur(10px); }
+    .info-block h3 { font-size: 18px; margin: 0 0 12px; color: var(--text); font-weight: 800; }
+    .info-block p { margin: 0 0 10px; font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+    
+    .support { margin-top: 16px; padding: 24px; border-radius: 24px; background: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; backdrop-filter: blur(10px); }
+    .support div { margin-bottom: 8px; }
+    .support b { font-size: 16px; font-weight: 800; }
+    .support p { font-size: 13px; color: var(--text-muted); margin: 4px 0 0; }
+    .support a { background: var(--text); color: var(--bg); text-decoration: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 800; text-align: center; display: block; transition: 0.2s; }
+    .support a:active { opacity: 0.8; transform: scale(0.98); }
+    .support a.btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    
+    footer { text-align: center; color: var(--text-muted); font-size: 12px; padding: 32px 0 10px; opacity: 0.7; }
+  </style>
+</head>
+<body class="theme-all">
+<div class="app">
+  <header>
+    <div class="logo">LIRIX</div>
+  </header>
+  
+  <section class="hero">
+    <span class="hero-top-tag">Единая экосистема</span>
+    <h1>Купи свой<br><span>аккаунт</span></h1>
+    <p>Яндекс, Такси, Каршеринг, Курьер, Верификация. Мгновенная выдача и полный инструктаж.</p>
+    
+    <div class="hero-buttons">
+      <a href="https://t.me/LIRIXONE1" target="_blank" rel="noopener" class="btn-buy" style="flex: 0.4;">TG</a>
+      <a href="https://t.me/LirixCore" target="_blank" rel="noopener" class="btn-tg" style="flex: 1;">Купить</a>
+    </div>
+  </section>
+
+  <!-- Красивые фильтры-таблетки -->
+  <div class="filters-wrapper">
+    <button class="filter-btn active" data-quick="all">🌐 Все сервисы</button>
+    <button class="filter-btn" data-quick="delivery">🚚 Доставка</button>
+    <button class="filter-btn" data-quick="taxi">🚕 Такси</button>
+    <button class="filter-btn" data-quick="carsharing">🚗 Каршеринг</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input id="search" class="search" type="search" placeholder="Поиск сервиса..." autocomplete="off">
+    </div>
+  </div>
+  
+  <div class="section-title">
+    <h2>Доступные системы</h2>
+    <span class="count" id="count"></span>
+  </div>
+  
+  <div class="catalog-layout" id="catalog-layout"></div>
+  <div id="other-container"></div>
+
+  <div class="info-block">
+    <h3>🛡️ Безопасная сделка</h3>
+    <p>По вашему желанию сделку можно провести через <b>крупные сервисы гарантов</b> (Lolzteam или топовые чаты), чтобы полностью обезопасить себя.</p>
+    <p>Схема простая: вы переводите средства гаранту, мы передаем аккаунт, вы его проверяете, и только потом гарант отправляет деньги нам. <b>Если гарант не нужен — можем провести сделку напрямую.</b></p>
+    <p><b>Комиссия гаранта (если вы его выбираете): ~5% (оплачивается вами).</b></p>
+  </div>
+
+  <div class="support">
+    <div>
+      <b>Нужна помощь?</b>
+      <p>Напишите нам, и мы настроим всё под вас.</p>
+    </div>
+    <a href="https://t.me/LirixCore" target="_blank" rel="noopener">Написать в ЛС ↗</a>
+    <a href="https://t.me/LIRIXONE1" target="_blank" rel="noopener" class="btn-secondary">⚡ Наш Telegram-канал</a>
+  </div>
+  
+  <footer>© 2026 LIRIX SYSTEM · WE DON'T LEAVE YOU ALONE</footer>
+</div>
+
+<dialog id="modal">
+  <div class="modal-drag-handle"></div>
+  <h2 id="modalTitle"></h2>
+  <div class="modal-content" id="modalDesc"></div>
+  <div class="modal-actions">
+    <button class="close-btn" id="closeBtn">Закрыть</button>
+    <a href="https://t.me/LirixCore" target="_blank" rel="noopener" class="btn-buy-modal">Купить</a>
+  </div>
+</dialog>
+
+<script>
+(() => {
+ const tg=window.Telegram?.WebApp;
+ if(tg){tg.ready();tg.expand();try{tg.setHeaderColor('#040810');tg.setBackgroundColor('#040810')}catch(e){}}
+
+ // === КРАСИВЫЕ МАШИНЫ ДЛЯ ВСЕХ СЕРВИСОВ ===
+ const IMG_MERCEDES = 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1000&auto=format&fit=crop'; // Mercedes
+ const IMG_BMW = 'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop'; // BMW
+ const IMG_AUDI = 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=1000&auto=format&fit=crop'; // Audi
+ const IMG_PORSCHE = 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1000&auto=format&fit=crop'; // Porsche
+ const IMG_BMW_M = 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=1000&auto=format&fit=crop'; // BMW M-Series
+ const IMG_MERC_AMG = 'https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=1000&auto=format&fit=crop'; // Mercedes AMG
+
+ const faceControlBlock = `
+    <div class="m-section" style="border-color: var(--border);">
+        <h4>📸 Фейс-контроль</h4>
+        <p>Не волнуйтесь насчет проверок! <b>Со всем поможем.</b> Наши аккаунты полностью готовы к платформе.</p>
+    </div>
+ `;
+
+ const discountBlock = `
+    <div style="background: var(--surface); border: 1px dashed var(--accent); padding: 16px; border-radius: 20px; margin-top: 16px; text-align: center;">
+        <b style="color: var(--accent); font-size: 15px; display: block; margin-bottom: 4px;">🎁 Бонус за отзыв!</b>
+        <span style="font-size: 13px; color: var(--text-muted);">Оставьте отзыв и получите <b>скидку 10%</b> на следующий заказ!</span>
+    </div>
+ `;
+
+ const infoDelivery = (name) => `
+    <div class="m-section">
+      <h4>🛵 Режим работы</h4>
+      <p>Идеально для подработки или фултайма. Пешком, на велосипеде или авто. Гибкий график.</p>
+    </div>
+    <div class="m-section">
+      <h4>♾️ Стабильность</h4>
+      <p><span class="highlight-text">Гарантия долгосрочной работы.</span> Блокировка возможна <b>ТОЛЬКО</b> при ваших нарушениях. Работайте аккуратно — аккаунт прослужит годы или месяцы, все зависит от ваших нарушений.</p>
+    </div>
+    <div class="m-section">
+      <h4>💎 Качество</h4>
+      <p>Новые аккаунты, ручные дропы на связи. Бесплатная замена при тех. неисправностях.</p>
+    </div>
+    <div class="m-section">
+      <h4>📱 В комплекте</h4>
+      <ul>
+        <li>Аккаунт в ${name}.</li>
+        <li>Приложение «Мой налог».</li>
+        <li><b>Полный пакет документов</b>.</li>
+        <li><b>Приложение обхода проверок</b>.</li>
+        <li>Видео-инструктаж.</li>
+      </ul>
+      <p style="margin-top:12px; color: var(--text);"><b>От вас:</b> Android (10+) и чистая SIM.</p>
+    </div>
+    <div class="m-section">
+      <h4>🛒 Схема сделки</h4>
+      <ol class="step-list">
+        <li>Пишете нам в Telegram.</li>
+        <li>Обговариваем детали.</li>
+        <li>Оплата (крипта/карта).</li>
+        <li>Выдача + видео-настройка.</li>
+        <li>Выходите и зарабатываете!</li>
+      </ol>
+      <span class="alert-text">⚠️ Возврат средств из-за «передумал» не делается.</span>
+    </div>
+    ${faceControlBlock}
+    ${discountBlock}
+ `;
+
+ const infoTaxi = (name) => `
+    <div class="m-section">
+      <h4>🚕 Режим работы</h4>
+      <p>Высокий доход, свой график. Потребуется автомобиль (свой или в аренду).</p>
+    </div>
+    <div class="m-section">
+      <h4>♾️ Стабильность</h4>
+      <p><span class="highlight-text">Долгосрочная гарантия.</span> Блокировка <b>ТОЛЬКО</b> при ДТП по вашей вине, штрафах ГИБДД или неуплате комиссии.</p>
+    </div>
+    <div class="m-section">
+      <h4>💎 Качество</h4>
+      <p>Новые аккаунты, ручные дропы. Замена при тех. неисправностях.</p>
+    </div>
+    <div class="m-section">
+      <h4>📱 В комплекте</h4>
+      <ul>
+        <li>Аккаунт в ${name}.</li>
+        <li>«Мой налог».</li>
+        <li><b>Документы для проверок</b>.</li>
+        <li><b>Приложение обхода проверок</b>.</li>
+        <li>Видео-инструкция.</li>
+      </ul>
+      <p style="margin-top:12px; color: var(--text);"><b>От вас:</b> Android (10+), чистая SIM.</p>
+    </div>
+    <div class="m-section">
+      <h4>🛒 Схема сделки</h4>
+      <ol class="step-list">
+        <li>Пишете в Telegram.</li>
+        <li>Обсуждаем детали.</li>
+        <li>Оплата.</li>
+        <li>Выдача + настройка.</li>
+        <li>Выходите на линию!</li>
+      </ol>
+      <span class="alert-text">⚠️ Возврат средств из-за «передумал» не делается.</span>
+    </div>
+    ${faceControlBlock}
+    ${discountBlock}
+ `;
+
+ const infoCarsharing = (name) => `
+    <div class="m-section">
+      <h4>🚘 Режим работы</h4>
+      <p>Заработок без своего авто. Арендуете машину через приложение.</p>
+      <p><b>Привязка карты:</b> +900 ₽ (чтобы оплачивать поездки самостоятельно).</p>
+    </div>
+    <div class="m-section">
+      <h4>♾️ Гарантия 4 месяца</h4>
+      <p>При аккуратной езде аккаунт живет долго. Блокировка <b>ТОЛЬКО</b> при ДТП, штрафах или порче салона.</p>
+    </div>
+    <div class="m-section">
+      <h4>💎 Качество</h4>
+      <p>Ручные дропы на связи. Замена только при тех. неисправностях сервиса.</p>
+    </div>
+    <div class="m-section">
+      <h4>📱 В комплекте</h4>
+      <ul>
+        <li>Аккаунт в ${name}.</li>
+        <li><b>Пакет документов</b>.</li>
+        <li><b>Приложение обхода проверок</b>.</li>
+        <li>Видео-инструктаж.</li>
+        <li>Опционально: привязка карты (+900 ₽).</li>
+      </ul>
+      <p style="margin-top:12px; color: var(--text);"><b>От вас:</b> Android (10+), чистая SIM.</p>
+    </div>
+    <div class="m-section">
+      <h4>🛒 Схема сделки</h4>
+      <ol class="step-list">
+        <li>Пишете в Telegram.</li>
+        <li>Обсуждаем детали.</li>
+        <li>Оплата.</li>
+        <li>Выдача + настройка.</li>
+        <li>За руль!</li>
+      </ol>
+      <span class="alert-text">⚠️ Возврат средств из-за «передумал» не делается.</span>
+    </div>
+    ${faceControlBlock}
+    ${discountBlock}
+ `;
+
+ const items=[
+  // --- ДОСТАВКА (Заменены картинки на машины) ---
+  {n:'Яндекс Доставка', c:'delivery', i:'🚚', s:'Курьерская доставка', p:'6 000 ₽', img: IMG_MERC_AMG, d:`<span class="price-tag">6 000 ₽</span><p>Огромный поток заказов для пеших и авто-курьеров.</p>${infoDelivery('Яндекс Доставка')}`},
+  {n:'Купер', c:'delivery', i:'🛍️', s:'Доставка продуктов', p:'6 000 ₽', img: IMG_BMW_M, d:`<span class="price-tag">6 000 ₽</span><p>Бывшая доставка СберМаркет. Работа по магазинам и аптекам.</p>${infoDelivery('Купер')}`},
+  {n:'Самокат', c:'delivery', i:'🛵', s:'Доставка за 15 минут', p:'5 000 ₽', img: IMG_AUDI, d:`<span class="price-tag">5 000 ₽</span><p>Быстрые и короткие смены, отличная оплата за час.</p>${infoDelivery('Самокат')}`},
+  {n:'Достависта', c:'delivery', i:'⚡', s:'Курьерская платформа', p:'4 500 ₽', img: IMG_PORSCHE, d:`<span class="price-tag">4 500 ₽</span><p>Гибкий сервис: пешком, на велосипеде или на машине.</p>${infoDelivery('Достависта')}`},
+  {n:'Ozon', c:'delivery', i:'📦', s:'Логистика и доставка', p:'5 000 ₽', img: IMG_MERCEDES, d:`<span class="price-tag">5 000 ₽</span><p>Работа курьером или сборщиком на складах.</p>${infoDelivery('Ozon')}`},
+  {n:'Wildberries', c:'delivery', i:'🟣', s:'Маркетплейс и логистика', p:'4 000 ₽', img: IMG_BMW, d:`<span class="price-tag">4 000 ₽</span><p>Стабильные заказы. Аккаунты сделаны строго под вас.</p>${infoDelivery('Wildberries')}`},
+  {n:'X5 Доставка', c:'delivery', i:'🛒', s:'Доставка из дарксторов', p:'4 000 ₽', img: IMG_AUDI, d:`<span class="price-tag">4 000 ₽</span><p>Доставка из «Пятерочки» и «Перекрестка».</p>${infoDelivery('X5 Доставка')}`},
+  {n:'СДЭК', c:'delivery', i:'🏢', s:'Курьерская служба', p:'4 000 ₽', img: IMG_PORSCHE, d:`<span class="price-tag">4 000 ₽</span><p>Огромная сеть пунктов выдачи и курьеров.</p>${infoDelivery('СДЭК')}`},
+  {n:'Почта России', c:'delivery', i:'✉️', s:'Доставка писем', p:'4 000 ₽', img: IMG_MERC_AMG, d:`<span class="price-tag">4 000 ₽</span><p>Масштабный почтовый сервис страны.</p>${infoDelivery('Почта России')}`},
+
+  // --- ТАКСИ (Везде машины) ---
+  {n:'Яндекс Такси', c:'taxi', i:'🚕', s:'Платформа поездок', p:'7 000 ₽', img: IMG_BMW_M, d:`<span class="price-tag">7 000 ₽</span><p>Самый крупный сервис. Огромный поток заказов и высокие заработки.</p>${infoTaxi('Яндекс Такси')}`},
+  {n:'Uber', c:'taxi', i:'🚖', s:'Сервис поездок', p:'5 000 ₽', img: IMG_MERCEDES, d:`<span class="price-tag">5 000 ₽</span><p>Международный сервис. Отличная альтернатива.</p>${infoTaxi('Uber')}`},
+  {n:'Maxim', c:'taxi', i:'🚘', s:'Сервис поездок', p:'5 000 ₽', img: IMG_AUDI, d:`<span class="price-tag">5 000 ₽</span><p>Популярен в регионах, много заказов, лояльные условия.</p>${infoTaxi('Maxim')}`},
+  {n:'Drivee', c:'taxi', i:'🚗', s:'Платформа поездок', p:'5 000 ₽', img: IMG_PORSCHE, d:`<span class="price-tag">5 000 ₽</span><p>Быстрый рост, хорошие бонусы для новичков.</p>${infoTaxi('Drivee')}`},
+  {n:'WB Taxi (РБ)', c:'taxi', i:'🟪', s:'Такси в Беларуси', p:'6 000 ₽', img: IMG_MERC_AMG, d:`<span class="price-tag">6 000 ₽</span><p>Работа в такси Wildberries на территории РБ.</p>${infoTaxi('WB Taxi (РБ)')}`},
+  {n:'Апельсин', c:'taxi', i:'🍊', s:'Сервис такси', p:'5 000 ₽', img: IMG_BMW, d:`<span class="price-tag">5 000 ₽</span><p>Хорошие условия для водителей.</p>${infoTaxi('Апельсин')}`},
+  {n:'Fasten', c:'taxi', i:'⚡', s:'Сервис поездок', p:'5 000 ₽', img: IMG_AUDI, d:`<span class="price-tag">5 000 ₽</span><p>Быстрый и удобный сервис.</p>${infoTaxi('Fasten')}`},
+  {n:'Ситимобил', c:'taxi', i:'🚙', s:'Портал водителей', p:'В ЛС', img: IMG_PORSCHE, d:`<span class="price-tag">В ЛС</span><p>В наличии и на заказ. Уточняйте цены в ЛС.</p>${infoTaxi('Ситимобил')}`},
+  {n:'Таксовичкоф', c:'taxi', i:'🚕', s:'Набор водителей', p:'В ЛС', img: IMG_MERCEDES, d:`<span class="price-tag">В ЛС</span><p>Цена зависит от региона и тарифа. Пишите в ЛС.</p>${infoTaxi('Таксовичкоф')}`},
+
+  // --- КАРШЕРИНГ (Везде машины) ---
+  {n:'Делимобиль', c:'carsharing', i:'🚗', s:'Базовый тариф', p:'6 400 ₽', img: IMG_MERC_AMG, d:`<span class="price-tag">6 400 ₽</span><p>Крупный парк, включая грузовые фургоны.</p>${infoCarsharing('Делимобиль')}`},
+  {n:'Ситидрайв', c:'carsharing', i:'🏙️', s:'Базовый тариф', p:'6 400 ₽', img: IMG_BMW_M, d:`<span class="price-tag">6 400 ₽</span><p>Бывший YouDrive. Премиум-статусы.</p>${infoCarsharing('Ситидрайв')}`},
+  {n:'Яндекс Драйв', c:'carsharing', i:'🚙', s:'Базовый тариф', p:'6 400 ₽', img: IMG_AUDI, d:`<span class="price-tag">6 400 ₽</span><p>Огромный выбор от эконома до бизнеса.</p>${infoCarsharing('Яндекс Драйв')}`},
+  {n:'BelkaCar', c:'carsharing', i:'🐿️', s:'Базовый тариф', p:'6 400 ₽', img: IMG_PORSCHE, d:`<span class="price-tag">6 400 ₽</span><p>Качественный автопарк, чистые машины.</p>${infoCarsharing('BelkaCar')}`},
+  {n:'Cars7', c:'carsharing', i:'7️⃣', s:'Бизнес-класс', p:'6 600 ₽', img: IMG_MERCEDES, d:`<span class="price-tag">6 600 ₽</span><p>Японские авто и бизнес-класс.</p>${infoCarsharing('Cars7')}`},
+  {n:'Easydrive24', c:'carsharing', i:'🟢', s:'Базовый тариф', p:'6 000 ₽', img: IMG_BMW, d:`<span class="price-tag">6 000 ₽</span><p>Отличный вариант для старта.</p>${infoCarsharing('Easydrive24')}`},
+  {n:'SIXT', c:'carsharing', i:'⬛', s:'Премиум', p:'13 000 ₽', img: IMG_AUDI, d:`<span class="price-tag">13 000 ₽</span><p>Премиальный международный сервис.</p>${infoCarsharing('SIXT')}`},
+  {n:'Anytime РБ', c:'carsharing', i:'🇧🇾', s:'Тариф (РБ)', p:'7 500 ₽', img: IMG_PORSCHE, d:`<span class="price-tag">7 500 ₽</span><p>Каршеринг для Беларуси.</p>${infoCarsharing('Anytime РБ')}`},
+  {n:'Anytime Чехия', c:'carsharing', i:'🇨🇿', s:'Тариф (Чехия)', p:'11 000 ₽', img: IMG_MERC_AMG, d:`<span class="price-tag">11 000 ₽</span><p>Каршеринг для Чехии.</p>${infoCarsharing('Anytime Чехия')}`},
+
+  // --- ДРУГОЕ ---
+  {n:'Другие системы', c:'other', i:'➕', s:'По запросу', p:'В ЛС', img: IMG_MERCEDES, d:`<span class="price-tag">По запросу</span><p>Нужен сервис, которого нет в списке? Напишите нам.</p>${faceControlBlock}${discountBlock}`}
+ ];
+
+ const catalogLayout = document.querySelector('#catalog-layout');
+ const otherContainer = document.querySelector('#other-container');
+ const search = document.querySelector('#search');
+ const count = document.querySelector('#count');
+ 
+ const modal = document.getElementById('modal');
+ const modalTitle = document.getElementById('modalTitle');
+ const modalDesc = document.getElementById('modalDesc');
+ const closeBtn = document.getElementById('closeBtn');
+
+ let currentFilter = 'all';
+
+ window.applyFilter = function(target) {
+   if (target === 'all') {
+       currentFilter = 'all';
+   } else if (currentFilter === target) {
+       currentFilter = 'all';
+   } else {
+       currentFilter = target;
+   }
+
+   document.body.className = 'theme-' + currentFilter;
+
+   if(window.Telegram?.WebApp?.setHeaderColor) {
+       const themes = { 'all': '#09090b', 'delivery': '#050000', 'taxi': '#0a0900', 'carsharing': '#040810' };
+       try { window.Telegram.WebApp.setHeaderColor(themes[currentFilter]); } catch(e){}
+   }
+
+   document.querySelectorAll('[data-quick]').forEach(btn => {
+       btn.classList.toggle('active', btn.dataset.quick === currentFilter);
+   });
+
+   render();
+   document.querySelector('.section-title').scrollIntoView({behavior:'smooth',block:'start'});
+ }
+
+ function render(){
+  const q = search.value.trim().toLowerCase();
+  let foundCount = 0;
+  const filteredItems = items.filter(x => {
+      const matchesSearch = (x.n + ' ' + x.s).toLowerCase().includes(q);
+      if (x.c === 'other') return matchesSearch; 
+      const matchesFilter = (currentFilter === 'all' || x.c === currentFilter);
+      return matchesSearch && matchesFilter;
+  });
+
+  const hasDelivery = filteredItems.some(x => x.c === 'delivery');
+  const hasTaxi = filteredItems.some(x => x.c === 'taxi');
+  const hasCarsharing = filteredItems.some(x => x.c === 'carsharing');
+  const hasOther = filteredItems.some(x => x.c === 'other');
+
+  let html = '';
+
+  if (hasDelivery) {
+      html += `<div class="category-col"><div class="cards-wrapper">`;
+      filteredItems.filter(x => x.c === 'delivery').forEach(x => { foundCount++; html += renderCard(x); });
+      html += `</div></div>`;
+  }
+  if (hasTaxi) {
+      html += `<div class="category-col"><div class="cards-wrapper">`;
+      filteredItems.filter(x => x.c === 'taxi').forEach(x => { foundCount++; html += renderCard(x); });
+      html += `</div></div>`;
+  }
+  if (hasCarsharing) {
+      html += `<div class="category-col"><div class="cards-wrapper">`;
+      filteredItems.filter(x => x.c === 'carsharing').forEach(x => { foundCount++; html += renderCard(x); });
+      html += `</div></div>`;
+  }
+
+  catalogLayout.innerHTML = html;
+
+  if (hasOther) {
+      foundCount++;
+      const otherItem = items.find(i => i.c === 'other');
+      otherContainer.innerHTML = `<div class="other-card-wrapper" style="margin-top:16px;"><div class="card" onclick="openModal(${items.indexOf(otherItem)})"><div class="ico">${otherItem.i}</div><div class="card-content"><h3>${otherItem.n}</h3><p>${otherItem.s}</p></div><div class="details-btn">→</div></div></div>`;
+  } else { otherContainer.innerHTML = ''; }
+
+  count.textContent = foundCount + ' сервисов';
+ }
+
+ function renderCard(x) {
+     return `
+        <article class="card" onclick="openModal(${items.indexOf(x)})">
+          <div class="ico">${x.i}</div>
+          <div class="card-content">
+            <h3>${x.n}</h3>
+            <p>${x.s}</p>
+          </div>
+          <div class="details-btn">→</div>
+        </article>
+      `;
+ }
+
+ window.openModal = function(index) {
+    const item = items[index];
+    modalTitle.textContent = item.n;
+    let bannerHtml = '';
+    if (item.img) { bannerHtml = `<div class="modal-banner-wrapper"><img src="${item.img}" alt="${item.n}"></div>`; }
+    modalDesc.innerHTML = bannerHtml + item.d;
+    
+    modalDesc.scrollTop = 0;
+    modal.style.transform = '';
+    
+    modal.showModal();
+    if(window.Telegram?.WebApp?.HapticFeedback) { window.Telegram.WebApp.HapticFeedback.impactOccurred('light'); }
+ }
+
+ closeBtn.addEventListener('click', () => { modal.close(); });
+
+ modal.addEventListener('click', (e) => {
+   const rect = modal.getBoundingClientRect();
+   const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+     rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+   if (!isInDialog) { modal.close(); }
+ });
+
+ let touchStart = 0;
+ let touchMove = 0;
+ let isDragging = false;
+
+ modal.addEventListener('touchstart', (e) => {
+   if (e.target.closest('.modal-drag-handle') || modalDesc.scrollTop <= 0) {
+     touchStart = e.touches[0].clientY;
+     isDragging = true;
+     modal.style.transition = 'none';
+   }
+ }, { passive: true });
+
+ modal.addEventListener('touchmove', (e) => {
+   if (!isDragging) return;
+   touchMove = e.touches[0].clientY;
+   const delta = touchMove - touchStart;
+   if (delta > 0) {
+     modal.style.transform = `translateY(${delta}px)`;
+   }
+ }, { passive: true });
+
+ modal.addEventListener('touchend', () => {
+   if (!isDragging) return;
+   isDragging = false;
+   modal.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+   const delta = touchMove - touchStart;
+   if (delta > 100) { modal.close(); }
+   modal.style.transform = '';
+   touchStart = 0;
+   touchMove = 0;
+ }, { passive: true });
+
+ modal.addEventListener('close', () => {
+   modal.style.transform = '';
+   modal.style.transition = '';
+ });
+
+ document.querySelectorAll('[data-quick]').forEach(b=>b.addEventListener('click', ()=> { applyFilter(b.dataset.quick); }));
+ search.addEventListener('input',render);
+ render();
+})();
+</script>
+</body>
+</html>
